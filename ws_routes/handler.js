@@ -28,6 +28,18 @@ module.exports = function (io) {
       if (currentRoomId)
         socket.broadcast.to(currentRoomId).emit("time", time, t1, play);
     });
+    socket.safeOn("subDelay", (delay) => {
+      const currentRoomId = socket.handshake.currentRoom;
+      if (currentRoomId)
+        socket.broadcast.to(currentRoomId).emit("subDelay", delay);
+    });
+    socket.safeOn("subFile", (file) => {
+      console.log("recevied a file");
+      const currentRoomId = socket.handshake.currentRoom;
+      console.log(currentRoomId);
+      if (currentRoomId)
+        socket.broadcast.to(currentRoomId).emit("subFile", file);
+    });
     socket.safeOn("joinRoom", (roomId, name) => {
       socket.join(roomId);
       socket.broadcast.to(roomId).emit("alert", `${name} وارد اتاق شد`);
