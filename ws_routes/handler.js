@@ -28,16 +28,19 @@ module.exports = function (io) {
       if (currentRoomId)
         socket.broadcast.to(currentRoomId).emit("time", time, t1, play);
     });
-    socket.safeOn("joinRoom", (roomId) => {
+    socket.safeOn("joinRoom", (roomId, name) => {
       socket.join(roomId);
-      socket.broadcast.to(roomId).emit("alert", "یک نفر اضافه شد");
+      socket.broadcast.to(roomId).emit("alert", `${name} وارد اتاق شد`);
+      console.log("a client joined room " + roomId);
       socket.handshake.currentRoom = roomId;
+      socket.handshake.userName = name;
     });
     socket.on("disconnect", () => {
       console.log("A client has disconnected");
       const currentRoomId = socket.handshake.currentRoom;
+      const name = socket.handshake.userName;
       if (currentRoomId) {
-        socket.broadcast.to(currentRoomId).emit("alert", "یک نفر قطع شد");
+        socket.broadcast.to(currentRoomId).emit("alert", `${name} قطع شد`);
       }
       socket.leaveAll();
     });
