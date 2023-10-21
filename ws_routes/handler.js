@@ -34,11 +34,18 @@ module.exports = function (io) {
         socket.broadcast.to(currentRoomId).emit("subDelay", delay);
     });
     socket.safeOn("subFile", (file) => {
-      console.log("recevied a file");
+      console.log("recevied a sub");
       const currentRoomId = socket.handshake.currentRoom;
-      console.log(currentRoomId);
+
       if (currentRoomId)
         socket.broadcast.to(currentRoomId).emit("subFile", file);
+    });
+    socket.safeOn("movieLink", (file) => {
+      console.log("recevied a movie link");
+      const currentRoomId = socket.handshake.currentRoom;
+
+      if (currentRoomId)
+        socket.broadcast.to(currentRoomId).emit("movieLink", file);
     });
     socket.safeOn("joinRoom", (roomId, name) => {
       socket.join(roomId);
