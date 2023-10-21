@@ -40,6 +40,7 @@ module.exports = function (io) {
       if (currentRoomId)
         socket.broadcast.to(currentRoomId).emit("subFile", file);
     });
+
     socket.safeOn("movieLink", (file) => {
       console.log("recevied a movie link");
       const currentRoomId = socket.handshake.currentRoom;
@@ -47,6 +48,16 @@ module.exports = function (io) {
       if (currentRoomId)
         socket.broadcast.to(currentRoomId).emit("movieLink", file);
     });
+    socket.safeOn("msg", (text, callback) => {
+      console.log(text);
+      const currentRoomId = socket.handshake.currentRoom;
+      const name = socket.handshake.userName || "کاربر مهمان";
+      console.log(currentRoomId);
+      const obj = { name, text };
+      if (currentRoomId) socket.broadcast.to(currentRoomId).emit("msg", obj);
+      callback(obj);
+    });
+
     socket.safeOn("joinRoom", (roomId, name) => {
       socket.join(roomId);
       socket.broadcast.to(roomId).emit("alert", `${name} وارد اتاق شد`);
