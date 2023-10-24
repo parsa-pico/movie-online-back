@@ -7,7 +7,7 @@ module.exports = function () {
     "SMS_KEY",
   ];
   for (let input of env_inputs) {
-    if (!process.env[input]) {
+    if (process.env[input] === undefined) {
       const msg = `${input} not defined`;
       console.log(msg);
       throw new Error(msg);

@@ -4,6 +4,7 @@ const { ObjectId } = require("mongodb");
 const { ErrSender, authUser, ExpectedError } = require("./common.js");
 const studentHandler = require("./studentHandler.js");
 const staffHandler = require("./staffHandler.js");
+const { v4: uuidv4 } = require("uuid");
 
 module.exports = function (io) {
   // Socket.IO connection event
@@ -64,6 +65,10 @@ module.exports = function (io) {
       console.log("a client joined room " + roomId);
       socket.handshake.currentRoom = roomId;
       socket.handshake.userName = name;
+    });
+    socket.safeOn("createRoom", (callback) => {
+      const roomId = uuidv4();
+      callback(roomId);
     });
     socket.on("disconnect", () => {
       console.log("A client has disconnected");
