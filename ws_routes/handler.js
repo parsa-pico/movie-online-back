@@ -24,6 +24,24 @@ module.exports = function (io) {
       socket.on(eventName, wrappedHandler);
     };
 
+    const sendUsers = () => {
+      const currentRoomId = socket.handshake.currentRoom;
+      if (!currentRoomId) return;
+      const currentRoom = io.sockets.adapter.rooms.get(currentRoomId);
+      if (!currentRoom) return;
+      const currentUsers = [];
+
+      currentRoom.forEach((id) => {
+        const user = io.sockets.sockets.get(id);
+        if (user) {
+          const name = user.handshake.userName || "کاربر مهمان";
+          currentUsers.push(name);
+        }
+      });
+      console.log(currentUsers);
+      io.to(currentRoomId).emit("getUsers", currentUsers);
+    };
+
     socket.safeOn("time", (time, t1, play) => {
       const currentRoomId = socket.handshake.currentRoom;
       if (currentRoomId)
@@ -50,7 +68,6 @@ module.exports = function (io) {
         socket.broadcast.to(currentRoomId).emit("movieLink", file);
     });
     socket.safeOn("msg", (text, callback) => {
-      console.log(text);
       const currentRoomId = socket.handshake.currentRoom;
       const name = socket.handshake.userName || "کاربر مهمان";
       console.log(currentRoomId);
@@ -59,25 +76,30 @@ module.exports = function (io) {
       callback(obj);
     });
 
-    socket.safeOn("joinRoom", (roomId, name) => {
-      socket.join(roomId);
-      socket.broadcast.to(roomId).emit("alert", `${name} وارد اتاق شد`);
+    socket.safeOn("joinRoom", async (roomId, name) => {
+      await socket.join(roomId);
+      await socket.broadcast.to(roomId).emit("alert", `${name} وارد اتاق شد`);
       console.log("a client joined room " + roomId);
       socket.handshake.currentRoom = roomId;
       socket.handshake.userName = name;
+      sendUsers();
     });
     socket.safeOn("createRoom", (callback) => {
       const roomId = uuidv4();
       callback(roomId);
     });
-    socket.on("disconnect", () => {
+    socket.safeOn("leaveRooms", () => {
+      socket.leaveAll();
+    });
+    socket.on("disconnect", async () => {
       console.log("A client has disconnected");
       const currentRoomId = socket.handshake.currentRoom;
       const name = socket.handshake.userName;
       if (currentRoomId) {
         socket.broadcast.to(currentRoomId).emit("alert", `${name} قطع شد`);
       }
-      socket.leaveAll();
+      await socket.leaveAll();
+      sendUsers();
     });
   });
 };
