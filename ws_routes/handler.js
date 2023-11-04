@@ -60,6 +60,13 @@ module.exports = function (io) {
         socket.broadcast.to(currentRoomId).emit("subFile", file);
     });
 
+    // socket.on("voice", function (data) {
+    //   let newData = data.split(";");
+    //   newData[0] = "data:audio/ogg;";
+    //   newData = newData[0] + newData[1];
+    //   socket.broadcast.emit("send", newData);
+    // });
+
     socket.safeOn("movieLink", (file) => {
       console.log("recevied a movie link");
       const currentRoomId = socket.handshake.currentRoom;

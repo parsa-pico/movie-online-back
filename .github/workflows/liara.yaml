@@ -17,4 +17,4 @@ jobs:
           LIARA_TOKEN: ${{ secrets.LIARA_API_TOKEN }}
         run: |
           npm i -g @liara/cli@4
-          liara deploy --app="movieback" --api-token="$LIARA_TOKEN" --detach --port=3000 --region iran
+          liara deploy --app="mynode" --api-token="$LIARA_TOKEN" --detach --port=3000 --region iran
